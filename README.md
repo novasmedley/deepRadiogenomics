@@ -1,5 +1,5 @@
 # Radiogenomic neural networks
-`deepRadiogenomics` contains the source code to analyses in the paper entitled "Radiogenomic mapping with neural networks in glioblastoma patients."
+`deepRadiogenomics` contains the source code to analyses in the paper entitled [TBA].
 
 - [repo contents](###repo-contents)
 - [data](###data)
