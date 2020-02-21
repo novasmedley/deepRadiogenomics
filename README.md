@@ -1,16 +1,19 @@
 # Radiogenomic neural networks
-`deepRadiogenomics` contains the source code to analyses in the paper entitled [TBA].
+`deepRadiogenomics` contains the source code to analyses in the paper "Discovering and interpreting transcriptomic drivers of imaging traits using neural networks." The paper was accepted and will appear in Oxford Academic's Bioinformatics journal. A preprint is available on [arXiv](https://arxiv.org/abs/1912.05071).
+
+Note: an updated version has been made and will be added in the future.
 
 - [repo contents](###repo-contents)
 - [data](###data)
-- [system requirements](###system-requirements) 
-- [usage](###usage)
+- [install](###install) 
+- [usage + demos](###usage)
 - [citation](###citation)
 
 ### Repo contents
 - [bash](./bash) cmd line scripts for model training, e.g., grid search
+- [data](./data) full gbm dataset used in analysis
 - [demo_data](./demo) toy data
-- [R](./R): scripts for many post-modeling analyses, association testing, etc.
+- [R](./R): scripts for most post-modeling analyses, association testing, etc.
 
 * general modeling functions:
     * `neuralnet.py`
@@ -42,20 +45,20 @@ All data was originally taken from public repositories, where identifiable infor
 
 * Transcriptomic data was downloaded from the legacy version of The Cancer Genome Archive (TCGA). 
 
-* Imaging studies were download from from The Cancer Imaging Archive (TCIA). Vasarit traits were annotated by Dr. Suzie El-Saden and required pre-operative magnetic resonance imaging studies. 
-    * Vasari guidelines
-    * Annotation Google Form
+* Imaging studies were download from from The Cancer Imaging Archive (TCIA). Vasari traits were annotated by Dr. Suzie El-Saden and based on pre-operative magnetic resonance imaging studies. 
+    * `Vasari MR Feature Guide_v1.1.pdf` [Vasari](https://wiki.cancerimagingarchive.net/display/Public/VASARI+Research+Project) guidelines for imaging annotations
+    * [Our annotation form](https://forms.gle/ZCBp6uUo3w3tN8cw6) was based on the Round 2 Google Form used by [Vasari](https://wiki.cancerimagingarchive.net/display/Public/VASARI+Research+Project) Project
     
-Data files are available for download at XX in supplemental materials or at external links:
+Datasets are available in the [data](./data) folder.
 
 * training data
     * `gene_expression.txt` - gene expression profiles
     * `vasari_annotations.csv` - imaging traits
     * `nationwidechildrens.org_clinical_patient_gbm.txt` - TCGA-GBM clinical traits
 * gene sets
-    * `TCGA_unified_CORE_ClaNC840.txt` - Verhaak gene sets, [paper](https://doi.org/10.1016/j.ccr.2009.12.020)
-    * `gene_sets_Puchalski` - Puchalski gene sets, [paper](https://doi.org/10.1126/science.aaf2666)
-    * `msigdb_v6.2_GMTs` - MSigDB gene sets, available [here](http://software.broadinstitute.org/gsea/downloads.jsp)
+    * `TCGA_unified_CORE_ClaNC840.txt` - gene sets from [Verhaak, Roel GW, et al. "Integrated genomic analysis identifies clinically relevant subtypes of glioblastoma characterized by abnormalities in PDGFRA, IDH1, EGFR, and NF1." Cancer cell (2010)](https://doi.org/10.1016/j.ccr.2009.12.020)
+    * `gene_sets_Puchalski` - gene sets from [Puchalski, Ralph B., et al. "An anatomic transcriptional atlas of human glioblastoma." Science (2018)](https://doi.org/10.1126/science.aaf2666)
+    * `msigdb_v6.2_GMTs` - gene set collections from [Molecular Signatures Database](http://software.broadinstitute.org/gsea/downloads.jsp).
 
 For more details, see our paper.
 
@@ -63,7 +66,7 @@ For more details, see our paper.
 
 * Neural networks were trained on Amazon Web Services using Deep Learning AMI with Ubuntu 16.04.4 LTS and the `tensorflow_p36` environment. All other classifiers were implemented on an Ubuntu 18.04.1 LST machine.
 
-    * Check out AWS's environment documentation at XX.
+    * Check out AWS's environment [documentation](https://docs.aws.amazon.com/dlami/latest/devguide/overview-conda.html).
     * Python 3.6 dependencies (training of comparative models, gene masking, gene saliency):
     
         ```
@@ -113,42 +116,38 @@ For more details, see our paper.
     ```
 ### Usage
 
-* wget data files
-* 
-
-#### demos
-Demos were run using demo data, a small subset of the published dataset, on Ubuntu 18.04.1 LTS with 15.5 GB memory.
+Demos were run using demo data, a small subset of the published dataset, on Ubuntu 18.04.1 LTS with 15.5 GB memory. It has also been tested on macOS 10.14.5.
 
 **Neural network pipeline**:
 
 1. Train gene expression autoencoder (ae) - cross-validation(cv), 15 secs:
 
     ```
-    $ python3 train_gene_ae.py --exp ae_test --dir ../demo --data ../demo \
-    --label autoencoder --predType regression  --loss mae --opt Nadam --act tanh \
+    $ python3 train_gene_ae.py --exp ae_cv --dir demo --data demo_data \
+    --label autoencoder --predType regression --loss mae --opt Nadam --act tanh \
     --h1 200 --h2 100 --h3 50 --epoch 2 --folds 2 --patience 2
     ```
 
-1. (optional) Parse cv results: `$ python3 parse_cv.py --dir ../demo/ae_cv --model nn`
+1. (optional) Parse cv results: `$ python3 parse_cv.py --dir demo/ae_cv --model nn`
         
 1. Retrain ae - 15 secs: 
     
-    run `train_gene_ae.py` using the same parameters as above but set `--retrain` to `1` 
+    run `train_gene_ae.py` from Step 1 except: change `--exp ae_retrain` and add `--retrain 1`
  
 1. Train radiogenomic model - cv, 21 secs:
 
     ```
-    $ python3 train_nn.py ---exp nn_test --dir ../demo --data ../demo \
-    --pretrain ../demo/ae_retrain_test/autoencoder/neuralnets/200_100_50_0_0_tanh_decay_0_drop_0_opt_Nadam_loss_mae_bat_10_eph_2 \
+    $ python3 train_nn.py --exp nn_cv --dir demo --data demo_data \
+    --pretrain demo_results/ae_retrain/autoencoder/neuralnets/200_100_50_0_0_tanh_decay_0_drop_0_opt_Nadam_loss_mae_bat_10_eph_2 \
     --label f5 --opt Nadam --act tanh \
     --h1 200 --h2 100 --h3 50 --epoch 2 --folds 2 --patience 2 --freeze 0 --num_ae_layers 3
     ```
 
-1. (optional) Parse cv results: `$ python3 parse_cv.py --dir ../demo/nn_cv --model nn`
+1. (optional) Parse cv results: `$ python3 parse_cv.py --dir demo/nn_cv --model nn`
 
 1. Retrain radiogenomic model - 16 secs: 
     
-    run `train_nn.py` using the same parameters as above but set `--retrain` to `1` 
+    run `train_nn.py` from Step 4 except: change `--exp nn_retrain` and add `--retrain 1`
 
 1. Gene masking - 11 secs
 
@@ -161,21 +160,22 @@ Demos were run using demo data, a small subset of the published dataset, on Ubun
 
 **Train other models**:
 
-1. Fit logit with l1 regularization  - 1.5 mins, fitting 1000 hyperparameters
+1. Fit logit with l1 regularization  - 2 secs, fitting 1000 hyperparameters
     ```
-    $ train_others.py --exp other_cv --dir ../demo --data ../demo \
+    $ python3 train_others.py --exp other_cv --dir demo --data demo_data \
     --dataType vasari --predType binaryClass --label f5 --model logit1 --folds 2 --cpus 7
     ```
 
 2. Parse cv results:
 
-    `$ python3 parse_cv.py --dir ../demo/other_cv --model other`
+    `$ python3 parse_cv.py --dir demo/other_cv --model other`
 
 ### Citation
 
 If you want to cite this work, please cite the paper:
 
 ```
+TBA!
 ```
 
 and the repo:
