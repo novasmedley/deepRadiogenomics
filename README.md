@@ -1,5 +1,5 @@
 # Radiogenomic neural networks
-`deepRadiogenomics` contains the source code to analyses in the paper "Discovering and interpreting transcriptomic drivers of imaging traits using neural networks." The paper was accepted and will appear in Oxford Academic's Bioinformatics journal. A preprint is available on [arXiv](https://arxiv.org/abs/1912.05071).
+`deepRadiogenomics` contains the source code to analyses in the paper "Discovering and interpreting transcriptomic drivers of imaging traits using neural networks." The paper was accepted into [Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa126). A preprint is available on [arXiv](https://arxiv.org/abs/1912.05071).
 
 Note: an updated version has been made and will be added in the future.
 
@@ -10,8 +10,7 @@ Note: an updated version has been made and will be added in the future.
 - [citation](###citation)
 
 ### Repo contents
-- [bash](./bash) cmd line scripts for model training, e.g., grid search
-- [data](./data) full gbm dataset used in analysis
+- [data](./data) full gbm dataset used in analysis - to be released
 - [demo_data](./demo) toy data
 - [R](./R): scripts for most post-modeling analyses, association testing, etc.
 
