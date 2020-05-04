@@ -1,5 +1,7 @@
 # Radiogenomic neural networks
-`deepRadiogenomics` contains the source code to analyses in the paper "Discovering and interpreting transcriptomic drivers of imaging traits using neural networks." The paper was accepted into [Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa126). A preprint is available on [arXiv](https://arxiv.org/abs/1912.05071).
+`deepRadiogenomics` contains the source code to analyses in the paper:
+
+Nova F Smedley, Suzie El-Saden, William Hsu, Discovering and interpreting transcriptomic drivers of imaging traits using neural networks, Bioinformatics, btaa126, [https://doi.org/10.1093/bioinformatics/btaa126](https://doi.org/10.1093/bioinformatics/btaa126)
 
 Note: an updated version has been made and will be added in the future.
 
